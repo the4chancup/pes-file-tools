@@ -38,6 +38,7 @@ def main(
 		outputFile.close()
 
 def usage():
+	print("pes-zlib-compress -- Compress a file using PES zlib compression")
 	print("Usage:")
 	print("  pes-zlib-compress [OPTIONS] <uncompressed file>...")
 	print("  pes-zlib-compress [OPTIONS] <uncompressed file> -o <output file>")
