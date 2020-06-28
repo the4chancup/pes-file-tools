@@ -1,6 +1,8 @@
 import io
 import struct
 
+from . import zlib
+
 class DecodeError(Exception):
 	pass
 
@@ -12,6 +14,7 @@ class UniformParameterFile:
 		self.entries = {}
 	
 	def read(self, byteBuffer):
+		byteBuffer = zlib.tryDecompress(byteBuffer)
 		data = memoryview(byteBuffer)
 		
 		if len(data) < 8:
