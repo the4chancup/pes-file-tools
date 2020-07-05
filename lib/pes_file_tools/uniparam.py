@@ -89,4 +89,3 @@ class UniformParameterFile:
 		stream = open(filename, 'wb')
 		stream.write(self.write())
 		stream.close()
-		

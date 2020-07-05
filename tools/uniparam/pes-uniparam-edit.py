@@ -3,6 +3,19 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 
 
 from pes_file_tools import uniparam, zlib
 
+def listFiles(filename):
+	if not os.path.isdir(filename):
+		return [filename]
+	else:
+		entries = []
+		for entry in os.listdir(filename):
+			if entry in ['.', '..']:
+				continue
+			fullEntry = os.path.join(filename, entry)
+			if os.path.isfile(fullEntry):
+				entries.append(fullEntry)
+		return entries
+
 def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 	activeUniparamFile = uniparam.UniformParameterFile()
 	try:
@@ -59,10 +72,10 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 	activeUniparamFile.writeFile(effectiveOutputFile)
 
 def usage():
-	print("pes-uniparam-edit -- Edit the contents of a PES UniformParamters file")
+	print("pes-uniparam-edit -- Edit the contents of a PES UniformParameters file")
 	print("Usage:")
-	print("  pes-uniparam-pack <UniformParameters file> [packed filename]...")
-	print("  pes-uniparam-pack <UniformParameters file> -d [packed filename]...")
+	print("  pes-uniparam-edit <UniformParameters file> [packed filename]...")
+	print("  pes-uniparam-edit <UniformParameters file> -d [packed filename]...")
 	print("Options:")
 	print("  -a, --add                  Add or replace packed files to UniformParameters file (default)")
 	print("  -d, --delete               Delete packed files from UniformParameters file")
@@ -101,8 +114,11 @@ while index < len(sys.argv):
 		uniparamFile = arg
 	else:
 		if addMode:
-			addedFiles.append(arg)
+			addedFiles += listFiles(arg)
 		else:
-			deletedFiles.append(arg)
+			deletedFiles += listFiles(arg)
+
+if uniparamFile is None:
+	usage()
 
 main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite)

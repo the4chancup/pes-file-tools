@@ -3,6 +3,19 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 
 
 from pes_file_tools import uniparam, zlib
 
+def listFiles(filename):
+	if not os.path.isdir(filename):
+		return [filename]
+	else:
+		entries = []
+		for entry in os.listdir(filename):
+			if entry in ['.', '..']:
+				continue
+			fullEntry = os.path.join(filename, entry)
+			if os.path.isfile(fullEntry):
+				entries.append(fullEntry)
+		return entries
+
 def main(
 	uniparamFile,
 	packedFiles,
@@ -61,7 +74,7 @@ while index < len(sys.argv):
 	elif uniparamFile is None:
 		uniparamFile = arg
 	else:
-		packedFiles.append(arg)
+		packedFiles += listFiles(arg)
 
 if uniparamFile is None:
 	usage()
