@@ -497,6 +497,11 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 	else:
 		raise DecodeError("Unsupported dds codec")
 	
+	if ftexPixelFormat > 4:
+		ftexVersion = 2.04
+	else:
+		ftexVersion = 2.03
+	
 	
 	
 	frameBuffer = bytearray()
@@ -528,7 +533,7 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 	
 	header = struct.pack('< 4s f HHHH  BB HIII  BB 14x  16x',
 		b'FTEX',
-		2.03,
+		ftexVersion,
 		ftexPixelFormat,
 		ddsHeight,
 		ddsWidth,
