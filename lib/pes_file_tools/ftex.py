@@ -441,7 +441,7 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 	if ddsFormatFlags & 0x4 == 0: # fourCC absent
 		if (
 			    (ddsFormatFlags & 0x40) > 0 # rgb
-			and (ddsFormatFlags & 0x1) > 1  # alpha
+			and (ddsFormatFlags & 0x1) > 0  # alpha
 			and ddsRBitMask == 0x00ff0000
 			and ddsGBitMask == 0x0000ff00
 			and ddsBBitMask == 0x000000ff
