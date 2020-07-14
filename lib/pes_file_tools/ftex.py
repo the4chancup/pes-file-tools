@@ -362,7 +362,11 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 				offset + chunkBufferOffset,
 			)
 		
-		return (headerBuffer + chunkBuffer, chunkCount)
+		output = headerBuffer + chunkBuffer
+		if len(output) % 8 > 0:
+			output += bytearray(8 - len(output) % 8)
+		
+		return (output, chunkCount)
 	
 	inputStream = io.BytesIO(ddsBuffer)
 	
