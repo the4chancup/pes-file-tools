@@ -51,9 +51,9 @@ def ddsMipmapSize(ftexFormat, width, height, depth, mipmapIndex):
 	(blockSizePixels, blockSizeBytes) = formatBlockConfiguration[ftexFormat]
 	scaleFactor = 2 ** mipmapIndex
 	
-	mipmapWidth = (width + scaleFactor - 1) // scaleFactor
-	mipmapHeight = (height + scaleFactor - 1) // scaleFactor
-	mipmapDepth = (depth + scaleFactor - 1) // scaleFactor
+	mipmapWidth = max(width // scaleFactor, 1)
+	mipmapHeight = max(height // scaleFactor, 1)
+	mipmapDepth = max(depth // scaleFactor, 1)
 	
 	widthBlocks = (mipmapWidth + blockSizePixels - 1) // blockSizePixels
 	heightBlocks = (mipmapHeight + blockSizePixels - 1) // blockSizePixels
