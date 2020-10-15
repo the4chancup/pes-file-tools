@@ -1,6 +1,7 @@
 import io
 import struct
 import zlib
+from .zlib import tryDecompress
 
 class DecodeError(Exception):
 	pass
@@ -561,7 +562,7 @@ def ddsToFtex(ddsFilename, ftexFilename, colorSpace):
 	inputBuffer = inputStream.read()
 	inputStream.close()
 	
-	outputBuffer = ddsToFtexBuffer(inputBuffer, colorSpace)
+	outputBuffer = ddsToFtexBuffer(tryDecompress(inputBuffer), colorSpace)
 	
 	outputStream = open(ftexFilename, 'wb')
 	outputStream.write(outputBuffer)
