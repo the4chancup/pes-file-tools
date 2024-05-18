@@ -2,6 +2,8 @@ import datetime
 import io
 import struct
 
+from .crilayla import decompressCrilayla
+
 class DecodeError(Exception):
 	pass
 
@@ -30,6 +32,7 @@ class UtfTable:
 		float32 = 8
 		string = 10
 		bytestring = 11
+		# I believe 1,3,5,7 are signed integers, but I have never seen them in any pes files
 	
 	datumSizes = {
 		UtfDatumType.int8: 1,
@@ -196,7 +199,8 @@ class UtfTable:
 				elif storageType == UtfTable.UtfDatumStorage.variable:
 					value = readValue(rowStream, datumType)
 				else:
-					print("Unknown encoding: %s" % encoding)
+					print("Unknown encoding: %s" % storageType)
+					value = None
 				
 				row[name] = value
 			self.rows.append(row)
@@ -297,11 +301,12 @@ class UtfTable:
 
 class CpkReader:
 	class FileEntry:
-		def __init__(self, name, size, offset, modificationTime):
+		def __init__(self, name, size, offset, modificationTime, compressedSize):
 			self.name = name
 			self.size = size
 			self.offset = offset
 			self.modificationTime = modificationTime
+			self.compressedSize = compressedSize
 	
 	def __init__(self):
 		self.stream = None
@@ -336,7 +341,7 @@ class CpkReader:
 					etocTable = None
 		
 		tocRows = [column.name for column in tocTable.columns]
-		for row in ['DirName', 'FileName', 'FileSize', 'FileOffset']:
+		for row in ['DirName', 'FileName', 'FileSize', 'FileOffset', 'ExtractSize']:
 			if row not in tocRows:
 				raise DecodeError("Incomplete table of contents")
 		
@@ -359,7 +364,7 @@ class CpkReader:
 			else:
 				modificationTime = None
 			
-			self.files.append(CpkReader.FileEntry(name, row['FileSize'], row['FileOffset'] + effectiveContentOffset, modificationTime))
+			self.files.append(CpkReader.FileEntry(name, row['ExtractSize'], row['FileOffset'] + effectiveContentOffset, modificationTime, row['FileSize']))
 	
 	def close(self):
 		if self.stream is not None:
@@ -368,7 +373,12 @@ class CpkReader:
 	
 	def readFile(self, entry):
 		self.stream.seek(entry.offset, 0)
-		return read(self.stream, entry.size)
+		content = read(self.stream, entry.compressedSize)
+		
+		if entry.size != entry.compressedSize and len(content) >= 16 and content[0:8] == b'CRILAYLA':
+			return decompressCrilayla(content)
+		
+		return content
 
 class CpkWriter:
 	class FileEntry:
