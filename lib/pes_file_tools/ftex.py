@@ -86,7 +86,7 @@ def ftexToDdsBuffer(ftexBuffer):
 				uncompressedSize,
 				offset,
 			) = struct.unpack('< HH I', header)
-			isCompressed = (offset & (1 << 31)) == 0
+			isCompressed = (compressedSize != uncompressedSize)
 			offset &= ~(1 << 31)
 			
 			chunks.append((offset, compressedSize, isCompressed))
